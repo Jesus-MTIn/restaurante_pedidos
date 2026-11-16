@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Verificador automático de la práctica de intercambio de información semántica.
 .DESCRIPTION
@@ -24,6 +24,7 @@ $requisitos = @()
 $pruebasEjecutadas = 0
 $pruebasAprobadas = 0
 $pruebasFallidas = 0
+$aserciones = 0
 $pendientesLista = @()
 
 function Registrar {
@@ -153,16 +154,25 @@ if ($exitCode -eq 0) {
     Registrar 'ERROR' 'Ejecución de pruebas automatizadas (php artisan test)'
 }
 
-# Intentar extraer contadores
-if ($testOutput -match 'Tests:\s*(\d+).*?(\d+)\s*passed') {
-    $pruebasEjecutadas = [int]$matches[1]
-    $pruebasAprobadas = [int]$matches[2]
-} elseif ($testOutput -match '(\d+)\s*passed') {
-    $pruebasAprobadas = [int]$matches[1]
-    $pruebasEjecutadas = $pruebasAprobadas
+# Extraer contadores reales del resultado JSON de php artisan test
+$aserciones = 0
+try {
+    $json = $testOutput | ConvertFrom-Json
+    if ($null -ne $json) {
+        $pruebasEjecutadas = [int]$json.tests
+        $pruebasAprobadas = [int]$json.passed
+        if ($json.PSObject.Properties.Name -contains 'failed') { $pruebasFallidas = [int]$json.failed } else { $pruebasFallidas = $pruebasEjecutadas - $pruebasAprobadas }
+        if ($json.PSObject.Properties.Name -contains 'assertions') { $aserciones = [int]$json.assertions }
+        if ($json.result -ne 'passed') { $pruebasFallidas = [Math]::Max(1, $pruebasFallidas) }
+    }
+} catch {
+    # Si no se puede interpretar el resultado, se considera error
+    $pruebasEjecutadas = 0
+    $pruebasAprobadas = 0
+    $pruebasFallidas = 1
 }
-if ($testOutput -match '(\d+)\s*failed') {
-    $pruebasFallidas = [int]$matches[1]
+if ($pruebasEjecutadas -eq 0) {
+    $pruebasFallidas = [Math]::Max(1, $pruebasFallidas)
 }
 
 # 13. Evidencias
@@ -197,6 +207,7 @@ $($archivosEncontrados | ForEach-Object { "- $_" } | Out-String)
 - Pruebas ejecutadas: $pruebasEjecutadas
 - Pruebas aprobadas: $pruebasAprobadas
 - Pruebas fallidas: $pruebasFallidas
+- Aserciones: $aserciones
 
 ## Requisitos pendientes
 
@@ -218,3 +229,4 @@ if ($pendientes -gt 0 -or $errores -gt 0 -or $pruebasFallidas -gt 0) {
 } else {
     exit 0
 }
+
