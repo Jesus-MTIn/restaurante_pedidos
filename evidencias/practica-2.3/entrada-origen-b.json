@@ -1,0 +1,17 @@
+{
+  "customer": {
+    "id": 1
+  },
+  "item": {
+    "product_id": 3,
+    "units": 2,
+    "unit_price": "5.50"
+  },
+  "delivery": {
+    "address": "Calle Kennedy",
+    "reference": "Casa blanca",
+    "observations": "Entrada principal",
+    "latitude": -0.94886,
+    "longitude": -80.63806
+  }
+}
