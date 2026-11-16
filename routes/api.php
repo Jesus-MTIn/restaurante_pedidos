@@ -5,6 +5,8 @@ use App\Http\Controllers\Api\V1\PedidoController;
 
 Route::prefix('v1')->group(function () {
     Route::post('pedidos', [PedidoController::class, 'store']);
+    Route::post('pedidos/origen-a', [PedidoController::class, 'storeOrigenA']);
+    Route::post('pedidos/origen-b', [PedidoController::class, 'storeOrigenB']);
     Route::get('pedidos/{id}', [PedidoController::class, 'show']);
     Route::patch('pedidos/{id}/estado', [PedidoController::class, 'actualizarEstado']);
 });

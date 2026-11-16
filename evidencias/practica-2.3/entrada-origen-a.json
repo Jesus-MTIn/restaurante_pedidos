@@ -1,0 +1,11 @@
+{
+  "clienteId": "1",
+  "productoId": "3",
+  "cantidad": "2",
+  "precioUnitario": "5,50",
+  "direccion": "Calle Kennedy",
+  "referencia": "Casa blanca",
+  "observaciones": "Entrada principal",
+  "latitud": "-0.94886",
+  "longitud": "-80.63806"
+}

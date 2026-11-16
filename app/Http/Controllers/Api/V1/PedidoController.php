@@ -8,9 +8,12 @@ use App\Http\Requests\ActualizarEstadoPedidoRequest;
 use App\Http\Resources\PedidoResource;
 use App\Models\Pedido;
 use App\Models\Producto;
+use App\Services\NormalizadorPedidos;
 use App\Traits\ApiResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 
 class PedidoController extends Controller
 {
@@ -18,9 +21,52 @@ class PedidoController extends Controller
 
     private const COSTO_ENTREGA = 2.50;
 
+    public function __construct(private NormalizadorPedidos $normalizador)
+    {
+    }
+
     public function store(CrearPedidoRequest $request): JsonResponse
     {
-        $data = $request->validated();
+        return $this->storeDesdeContrato($request->validated());
+    }
+
+    public function storeOrigenA(\Illuminate\Http\Request $request): JsonResponse
+    {
+        try {
+            $normalizado = $this->normalizador->normalizarOrigenA($request->all());
+        } catch (ValidationException $e) {
+            return $this->errorResponse('Datos del origen A invalidos.', $e->errors(), 422);
+        } catch (\Throwable $e) {
+            return $this->errorResponse('Error de normalizacion del origen A.', ['normalizacion' => [$e->getMessage()]], 422);
+        }
+
+        return $this->storeDesdeContrato($normalizado);
+    }
+
+    public function storeOrigenB(\Illuminate\Http\Request $request): JsonResponse
+    {
+        try {
+            $normalizado = $this->normalizador->normalizarOrigenB($request->all());
+        } catch (ValidationException $e) {
+            return $this->errorResponse('Datos del origen B invalidos.', $e->errors(), 422);
+        } catch (\Throwable $e) {
+            return $this->errorResponse('Error de normalizacion del origen B.', ['normalizacion' => [$e->getMessage()]], 422);
+        }
+
+        return $this->storeDesdeContrato($normalizado);
+    }
+
+    private function storeDesdeContrato(array $data): JsonResponse
+    {
+        $formRequest = new CrearPedidoRequest();
+        $validator = Validator::make($data, $formRequest->rules(), $formRequest->messages());
+        $formRequest->withValidator($validator);
+
+        if ($validator->fails()) {
+            return $this->errorResponse('Los datos normalizados no cumplen el contrato del pedido.', $validator->errors()->toArray(), 422);
+        }
+
+        $data = $validator->validated();
 
         $pedido = DB::transaction(function () use ($data) {
             $pedido = Pedido::create([

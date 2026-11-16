@@ -48,9 +48,11 @@ La API quedará disponible en `http://127.0.0.1:8000`.
 
 ## Endpoints
 
-- `POST /api/v1/pedidos` — Crear pedido.
-- `GET /api/v1/pedidos/{id}` — Consultar pedido.
-- `PATCH /api/v1/pedidos/{id}/estado` — Actualizar estado.
+- `POST /api/v1/pedidos` - Crear pedido (contrato original).
+- `POST /api/v1/pedidos/origen-a` - Crear pedido desde origen A (formulario web) con normalizacion.
+- `POST /api/v1/pedidos/origen-b` - Crear pedido desde origen B (servicio externo) con normalizacion.
+- `GET /api/v1/pedidos/{id}` - Consultar pedido.
+- `PATCH /api/v1/pedidos/{id}/estado` - Actualizar estado.
 
 ## Pruebas
 
