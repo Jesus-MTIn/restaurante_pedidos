@@ -16,6 +16,7 @@ class NormalizacionApiTest extends TestCase
     {
         parent::setUp();
         $this->seed(DatabaseSeeder::class);
+        $this->withBasicAuth('cliente1@estacionburger.test', 'password');
     }
 
     public function test_origen_a_crea_pedido_correctamente(): void

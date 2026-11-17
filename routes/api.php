@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\PedidoController;
 
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->middleware('auth.basic')->group(function () {
     Route::post('pedidos', [PedidoController::class, 'store']);
     Route::post('pedidos/origen-a', [PedidoController::class, 'storeOrigenA']);
     Route::post('pedidos/origen-b', [PedidoController::class, 'storeOrigenB']);

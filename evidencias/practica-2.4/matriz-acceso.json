@@ -1,0 +1,39 @@
+{
+  "endpoints": [
+    {
+      "endpoint": "/api/v1/pedidos",
+      "metodo": "POST",
+      "publico": false,
+      "usuario_autenticado": true,
+      "administrador": true
+    },
+    {
+      "endpoint": "/api/v1/pedidos/origen-a",
+      "metodo": "POST",
+      "publico": false,
+      "usuario_autenticado": true,
+      "administrador": true
+    },
+    {
+      "endpoint": "/api/v1/pedidos/origen-b",
+      "metodo": "POST",
+      "publico": false,
+      "usuario_autenticado": true,
+      "administrador": true
+    },
+    {
+      "endpoint": "/api/v1/pedidos/{id}",
+      "metodo": "GET",
+      "publico": false,
+      "usuario_autenticado": "solo propio",
+      "administrador": true
+    },
+    {
+      "endpoint": "/api/v1/pedidos/{id}/estado",
+      "metodo": "PATCH",
+      "publico": false,
+      "usuario_autenticado": false,
+      "administrador": true
+    }
+  ]
+}

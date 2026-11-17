@@ -16,6 +16,7 @@ class PedidoApiTest extends TestCase
     {
         parent::setUp();
         $this->seed(DatabaseSeeder::class);
+        $this->withBasicAuth('cliente1@estacionburger.test', 'password');
     }
 
     private function payloadValido(array $overrides = []): array
@@ -117,9 +118,17 @@ class PedidoApiTest extends TestCase
 
     public function test_actualizar_estado_correctamente(): void
     {
-        $this->postJson('/api/v1/pedidos', $this->payloadValido());
+        $pedido = \App\Models\Pedido::create([
+            'codigo' => 'PED-000001',
+            'cliente_id' => 1,
+            'estado' => 'pendiente',
+            'subtotal' => 13.50,
+            'costo_entrega' => 2.50,
+            'total' => 16.00,
+        ]);
 
-        $response = $this->patchJson('/api/v1/pedidos/1/estado', ['estado' => 'confirmado']);
+        $response = $this->withBasicAuth('admin@estacionburger.test', 'password')
+            ->patchJson("/api/v1/pedidos/{$pedido->id}/estado", ['estado' => 'confirmado']);
 
         $response->assertStatus(200)
             ->assertJsonPath('success', true)
@@ -138,9 +147,17 @@ class PedidoApiTest extends TestCase
 
     public function test_rechazar_transiciones_no_permitidas(): void
     {
-        $this->postJson('/api/v1/pedidos', $this->payloadValido());
+        $pedido = \App\Models\Pedido::create([
+            'codigo' => 'PED-000001',
+            'cliente_id' => 1,
+            'estado' => 'pendiente',
+            'subtotal' => 13.50,
+            'costo_entrega' => 2.50,
+            'total' => 16.00,
+        ]);
 
-        $response = $this->patchJson('/api/v1/pedidos/1/estado', ['estado' => 'entregado']);
+        $response = $this->withBasicAuth('admin@estacionburger.test', 'password')
+            ->patchJson("/api/v1/pedidos/{$pedido->id}/estado", ['estado' => 'entregado']);
 
         $response->assertStatus(422)
             ->assertJsonPath('success', false);

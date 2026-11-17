@@ -58,6 +58,8 @@ class PedidoController extends Controller
 
     private function storeDesdeContrato(array $data): JsonResponse
     {
+        $this->authorize('create', Pedido::class);
+
         $formRequest = new CrearPedidoRequest();
         $validator = Validator::make($data, $formRequest->rules(), $formRequest->messages());
         $formRequest->withValidator($validator);
@@ -125,6 +127,8 @@ class PedidoController extends Controller
     {
         $pedido = Pedido::with(['cliente', 'detalles.producto', 'direccionEntrega'])->findOrFail($id);
 
+        $this->authorize('view', $pedido);
+
         return $this->successResponse(
             new PedidoResource($pedido),
             'Pedido consultado correctamente'
@@ -134,6 +138,7 @@ class PedidoController extends Controller
     public function actualizarEstado(ActualizarEstadoPedidoRequest $request, int $id): JsonResponse
     {
         $pedido = Pedido::findOrFail($id);
+        $this->authorize('updateEstado', $pedido);
         $nuevoEstado = $request->validated('estado');
 
         if (! Pedido::puedeTransicionar($pedido->estado, $nuevoEstado)) {

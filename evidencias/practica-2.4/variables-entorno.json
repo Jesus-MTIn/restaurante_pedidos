@@ -1,0 +1,13 @@
+{
+  "variables_relevantes": [
+    "APP_NAME",
+    "APP_ENV",
+    "APP_KEY",
+    "APP_DEBUG",
+    "APP_URL",
+    "DB_CONNECTION",
+    "DB_DATABASE",
+    "AUTH_GUARD"
+  ],
+  "nota": "Solo se documentan nombres de variables, no valores secretos."
+}
